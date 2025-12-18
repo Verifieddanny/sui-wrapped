@@ -5,9 +5,9 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
-import { createRequire } from 'module';
+import { createRequire } from 'module'
 
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta.url)
 
 export default defineConfig({
   plugins: [
@@ -22,17 +22,16 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // 🟢 CRITICAL FIX:
-      // This forces "decimal.js-light/decimal" to point to the actual 
-      // "decimal.js-light" library file on your disk.
-      "decimal.js-light/decimal": require.resolve("decimal.js-light"),
+      // 1. Redirect the bad import to the real file
+      "decimal.js-light/decimal": require.resolve("decimal.js-light")
     },
   },
   ssr: {
-    // 🟢 CRITICAL FIX:
-    // This tells Vite: "Do not leave this as a 'require' statement.
-    // Bundle the code directly into my server file."
-    noExternal: ["decimal.js-light"],
-    external: ["@prisma/client", ".prisma/client"],
+    // 2. CRITICAL: Bundle Prisma Client so Vite can apply the alias to it.
+    // If we leave it external, Vite ignores the code inside it.
+    noExternal: ["@prisma/client", "decimal.js-light"],
+    
+    // 3. Ensure this is empty or does NOT contain @prisma/client
+    external: [], 
   },
 })
