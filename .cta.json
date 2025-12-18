@@ -1,0 +1,22 @@
+{
+  "initialized": true,
+  "mode": "file-router",
+  "projectName": "sui-wrapped",
+  "typescript": true,
+  "tailwind": true,
+  "git": true,
+  "addOnOptions": {
+    "prisma": {
+      "database": "postgres"
+    }
+  },
+  "packageManager": "pnpm",
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "prisma",
+    "start",
+    "eslint",
+    "nitro"
+  ]
+}

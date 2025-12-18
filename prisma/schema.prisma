@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  address       String        @id
+  isIndexed     Boolean       @default(false)
+  lastIndexedAt DateTime?
+  stats         UserStats?
+  transactions  Transaction[]
+}
+
+model UserStats {
+  id          String @id @default(uuid())
+  userAddress String @unique
+  user        User   @relation(fields: [userAddress], references: [address])
+
+  // Volume & Flow
+  totalVolumeUSD Float @default(0)
+  inflow         Float @default(0)
+  outflow        Float @default(0)
+  txCount        Int   @default(0)
+
+  // Activity
+  peakDay      String
+  peakDayCount Int
+
+  // Highlights
+  biggestTxHash   String?
+  biggestTxAmount Float   @default(0)
+
+  // Lists (Stored as JSON)
+  topAssets          Json // [{ symbol: "SUI", amount: 100 }, ...]
+  topInteractors     Json // [{ address: "0x...", count: 50 }, ...]
+  monthlyActivity    Json? // [{ month: "Jan", volume: 120 }, ...]
+  recentTransactions Json? // Full transaction objects for dashboard
+
+  // Persona
+  rankPercentile Int
+  archetype      String
+
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  digest      String   @id
+  timestamp   DateTime
+  sender      String
+  userAddress String
+  user        User     @relation(fields: [userAddress], references: [address])
+
+  balanceChanges Json
+  interactedWith String[] // Array of addresses interacted with in this tx
+
+  @@index([userAddress, timestamp])
+}
