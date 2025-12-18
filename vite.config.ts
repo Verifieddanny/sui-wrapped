@@ -11,13 +11,21 @@ const require = createRequire(import.meta.url)
 
 export default defineConfig({
   plugins: [
-    devtools(),
-    nitro({
-      // Prevent Nitro from crashing on the Prisma engine file
-      externals: {
-        external: ['.prisma/client', '.prisma/client/default', '.prisma/client/index']
+    // 🟢 1. Custom Plugin: Force .prisma/client/default to be external
+    // This runs before Vite tries to find the file on disk.
+    {
+      name: 'force-external-prisma',
+      enforce: 'pre',
+      resolveId(id) {
+        // Capture the internal engine import that is breaking the build
+        if (id.includes('.prisma/client/default')) {
+          return { id, external: true }
+        }
+        return null
       }
-    }),
+    },
+    devtools(),
+    nitro(),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
@@ -27,17 +35,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Fix the path so Vite can find the file during bundling
+      // 🟢 2. Fix the runtime crash by redirecting the broken package
       "decimal.js-light/decimal": require.resolve("decimal.js-light")
     },
   },
   ssr: {
-    // 🟢 THE FIX: 
-    // 1. Bundle @prisma/client so we can patch its imports.
-    // 2. Use a REGEX for decimal.js-light to catch the "/decimal" sub-path.
-    noExternal: ["@prisma/client", /decimal\.js-light/],
-    
-    // Keep the engine external to avoid build errors
-    external: [".prisma/client", ".prisma/client/default", ".prisma/client/index"], 
+    // 🟢 3. Bundle the wrapper so we can apply the alias to it
+    noExternal: ["@prisma/client", /decimal\.js-light/], 
   },
 })
