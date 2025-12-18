@@ -37,7 +37,7 @@ export const Route = createRootRoute({
       },
       {
         property: 'og:url',
-        content: 'https://sui-wrapped-alpha.vercel.app/',
+        content: 'https://sui-wrapped-five.vercel.app/',
       },
       {
         property: 'og:title',
@@ -49,7 +49,7 @@ export const Route = createRootRoute({
       },
       {
         property: 'og:image',
-        content: 'https://sui-wrapped-alpha.vercel.app/og-image.jpg',
+        content: 'https://sui-wrapped-five.vercel.app/og-image.jpg',
       },
       // --- Twitter ---
       {
@@ -58,7 +58,7 @@ export const Route = createRootRoute({
       },
       {
         name: 'twitter:url',
-        content: 'https://sui-wrapped-alpha.vercel.app/',
+        content: 'https://sui-wrapped-five.vercel.app/',
       },
       {
         name: 'twitter:title',
@@ -70,7 +70,7 @@ export const Route = createRootRoute({
       },
       {
         name: 'twitter:image',
-        content: 'https://sui-wrapped-alpha.vercel.app/og-image.jpg',
+        content: 'https://sui-wrapped-five.vercel.app/og-image.jpg',
       },
     ],
     links: [
