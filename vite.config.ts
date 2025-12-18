@@ -11,7 +11,6 @@ export default defineConfig({
     devtools(),
     
     nitro({
-      // 🟢 TELL NITRO: Do not bundle these. Leave them as require() calls.
       externals: {
         external: [
           '@prisma/client', 
@@ -28,14 +27,11 @@ export default defineConfig({
   ],
 
   ssr: {
-    // 🟢 TELL VITE: Do not bundle these. 
-    // This prevents the build crash AND the runtime crash.
     external: [
       '@prisma/client', 
       '@prisma/adapter-pg',
       'decimal.js-light'
     ],
-    // Ensure noExternal is empty or strictly excludes Prisma
     noExternal: [] 
   },
 })
