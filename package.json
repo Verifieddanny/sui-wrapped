@@ -3,20 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3000",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "post-cta-init": "npx create-db@latest",
-    "db:generate": "dotenv -e .env.local -- prisma generate",
-    "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
-    "db:studio": "dotenv -e .env.local -- prisma studio",
-    "db:seed": "dotenv -e .env.local -- prisma db seed",
-    "lint": "eslint",
-    "format": "prettier",
-    "check": "prettier --write . && eslint --fix"
-  },
+  "dev": "prisma generate && node scripts/fix-prisma-decimal.js && vite dev",
+  "build": "prisma generate && node scripts/fix-prisma-decimal.js && vite build",
+  "start": "vite preview",
+  "postinstall": "prisma generate && node scripts/fix-prisma-decimal.js"
+},
   "dependencies": {
     "@mysten/sui": "^1.45.2",
     "@prisma/adapter-pg": "^7.2.0",
@@ -30,6 +21,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "@vercel/analytics": "^1.6.1",
     "clsx": "^2.1.1",
+    "decimal.js-light": "^2.5.1",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.26",
     "html-to-image": "^1.11.13",
@@ -63,5 +55,10 @@
     "vitest": "^3.0.5",
     "web-vitals": "^5.1.0"
   },
-  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
+  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
+  "pnpm": {
+    "patchedDependencies": {
+      "decimal.js-light": "patches/decimal.js-light.patch"
+    }
+  }
 }

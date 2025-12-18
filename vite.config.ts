@@ -6,18 +6,32 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
+export default defineConfig({
   plugins: [
     devtools(),
-    nitro(),
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
+    
+    nitro({
+      externals: {
+        external: [
+          '@prisma/client', 
+          '@prisma/adapter-pg', 
+          'decimal.js-light'
+        ]
+      }
     }),
+    
+    viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),
   ],
-})
 
-export default config
+  ssr: {
+    external: [
+      '@prisma/client', 
+      '@prisma/adapter-pg',
+      'decimal.js-light'
+    ],
+    noExternal: [] 
+  },
+})

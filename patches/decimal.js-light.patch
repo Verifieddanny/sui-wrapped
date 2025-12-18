@@ -1,0 +1,68 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 843ac8680ae3a18ff2f9574ac631df50f0f9c0f2..0000000000000000000000000000000000000000
+diff --git a/decimal.min.js b/decimal.min.js
+deleted file mode 100644
+index 1881b46580a4cc1f36782015dc413828b2738050..0000000000000000000000000000000000000000
+diff --git a/doc/API.html b/doc/API.html
+deleted file mode 100644
+index 36ea3901440258231b11125ddc46870528067a58..0000000000000000000000000000000000000000
+diff --git a/doc/decimal.js.map b/doc/decimal.js.map
+deleted file mode 100644
+index 2a4be94d976ccca77d63f93a024b988739a9ef7a..0000000000000000000000000000000000000000
+diff --git a/package.json b/package.json
+index ef43c45b59c05c3ba5c49944a50a7d5ff6e00d69..5776af8b8da7e2986b261672df2db862e4c6eb38 100644
+--- a/package.json
++++ b/package.json
+@@ -1,36 +1,21 @@
+ {
+   "name": "decimal.js-light",
+-  "description": "An arbitrary-precision Decimal type for JavaScript.",
+   "version": "2.5.1",
+-  "keywords": [
+-    "arbitrary",
+-    "precision",
+-    "arithmetic",
+-    "big",
+-    "number",
+-    "decimal",
+-    "float",
+-    "biginteger",
+-    "bigdecimal",
+-    "bignumber",
+-    "bigint",
+-    "bignum"
+-  ],
+-  "repository" : {
+-    "type": "git",
+-    "url": "https://github.com/MikeMcl/decimal.js-light.git"
+-  },
+-  "main": "decimal",
+-  "module": "decimal.mjs",
+-  "browser": "decimal.js",
++  "main": "decimal.js",
+   "types": "decimal.d.ts",
+-  "author": {
+-    "name": "Michael Mclaughlin",
+-    "email": "M8ch88l@gmail.com"
+-  },
+-  "license": "MIT",
+-  "scripts": {
+-    "test": "node ./test/test.js",
+-    "build": "uglifyjs decimal.js --source-map doc/decimal.js.map -c -m -o decimal.min.js --preamble \"/* decimal.js-light v2.5.1 https://github.com/MikeMcl/decimal.js-light/LICENCE */\""
++  "files": [
++    "decimal.js",
++    "decimal.d.ts",
++    "decimal.mjs"
++  ],
++  "exports": {
++    ".": {
++      "import": "./decimal.mjs",
++      "require": "./decimal.js"
++    },
++    "./decimal": {
++      "import": "./decimal.mjs",
++      "require": "./decimal.js"
++    }
+   }
+ }
