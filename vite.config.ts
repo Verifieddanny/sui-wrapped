@@ -9,26 +9,22 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const shimPath = path.resolve(__dirname, "src/decimal-shim.ts")
 
 export default defineConfig({
   plugins: [
-    // 1. NITRO CONFIG (The Server Bundler)
-    nitro({
-      alias: {
-        // 🟢 CRITICAL MISSING PIECE: Tell Nitro about the shim too!
-        "decimal.js-light/decimal": shimPath
-      },
-      externals: {
-        // Keep the engine external to prevent build crashes
-        external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
-      }
-    }),
-    
-    // 2. BUILD SAFETY PLUGIN (Prevent Rollup Crash)
     {
-      name: 'force-external-prisma-engine',
+      name: 'prisma-patch-plugin',
       enforce: 'pre',
+      // 1. SEARCH & REPLACE:
+      // Read the source code of Prisma files. If we see the broken import string, 
+      // replace it with our safe alias "@decimal-shim".
+      transform(code, id) {
+        if (id.includes('@prisma') && code.includes('decimal.js-light/decimal')) {
+          return code.replace(/["']decimal\.js-light\/decimal["']/g, '"@decimal-shim"');
+        }
+      },
+      // 2. BLOCK THE ENGINE:
+      // Prevent the build crash by externalizing the engine file.
       resolveId(id) {
         if (id.includes('.prisma/client/default') || id.includes('.prisma/client/index')) {
           return { id, external: true }
@@ -36,23 +32,30 @@ export default defineConfig({
         return null
       }
     },
-    
     devtools(),
+    nitro({
+      externals: {
+        external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
+      }
+    }),
     viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),
   ],
 
-  // 3. VITE CONFIG (The App Bundler)
   resolve: {
     alias: {
-      "decimal.js-light/decimal": shimPath
+      // 3. DEFINE THE ALIAS:
+      // When the code asks for "@decimal-shim" (which we inserted above),
+      // give it the local shim file.
+      "@decimal-shim": path.resolve(__dirname, "src/decimal-shim.ts")
     },
   },
 
   ssr: {
-    // Open up the wrappers so we can rewrite imports inside them
+    // 4. BUNDLE EVERYTHING:
+    // Force Vite to process Prisma and Adapter so the transform hook (step 1) can run.
     noExternal: ["@prisma/client", "@prisma/adapter-pg"],
     external: [".prisma/client", ".prisma/client/index", ".prisma/client/default"], 
   },
