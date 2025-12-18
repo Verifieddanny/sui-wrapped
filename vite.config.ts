@@ -8,14 +8,27 @@ import { nitro } from 'nitro/vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// Necessary to get __dirname in ESM
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [
+    // 🟢 CUSTOM PLUGIN: The Guard Rail
+    // This runs before anything else and prevents the build crash.
+    {
+      name: 'force-external-prisma-engine',
+      enforce: 'pre',
+      resolveId(id) {
+        // If Rollup tries to bundle the database engine, STOP IT.
+        // Return external: true immediately.
+        if (id.includes('.prisma/client/default') || id.includes('.prisma/client/index')) {
+          return { id, external: true }
+        }
+        return null
+      }
+    },
     devtools(),
     nitro({
-      // Keep the engine external to prevent build crashes
+      // Redundant safety net for the server build
       externals: {
         external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
       }
@@ -30,16 +43,16 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      // 🟢 THE TRICK: Point to a LOCAL file. 
-      // Vite sees this as "user code" and is forced to bundle it.
+      // 🟢 THE SHIM: Fixes the runtime crash
+      // Redirects the broken import to your local file, forcing it to be bundled.
       "decimal.js-light/decimal": path.resolve(__dirname, "src/decimal-shim.ts")
     },
   },
 
   ssr: {
-    // Bundle the packages that use this library
+    // 🟢 Bundle the wrappers so the Alias works inside them
     noExternal: ["@prisma/client", "@prisma/adapter-pg"],
-    // Keep the engine external
+    // Keep the engine external (matches the plugin above)
     external: [".prisma/client", ".prisma/client/index", ".prisma/client/default"], 
   },
 })
