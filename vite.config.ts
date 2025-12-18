@@ -8,19 +8,6 @@ import { nitro } from 'nitro/vite'
 
 export default defineConfig({
   plugins: [
-    // 1. Custom Plugin: Intercepts the bad import path
-    {
-      name: 'fix-decimal-light',
-      enforce: 'pre',
-      resolveId(id) {
-        // If anything tries to import the broken sub-path...
-        if (id === 'decimal.js-light/decimal') {
-          // ...redirect it to the main package and force bundling
-          return { id: 'decimal.js-light', external: false }
-        }
-        return null
-      }
-    },
     devtools(),
     nitro(),
     viteTsConfigPaths({
@@ -30,9 +17,16 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  resolve: {
+    alias: {
+      // 🟢 THE FIX: Redirects the broken import to the main package
+      "decimal.js-light/decimal": "decimal.js-light",
+    },
+  },
   ssr: {
-    // 2. Force Vite to bundle this package into the server file
-    noExternal: ['decimal.js-light'],
-    external: ['@prisma/client', '.prisma/client']
+    // 🟢 SAFETY: Forces Vite to bundle this library into your server file
+    // so Vercel doesn't have to look for it in node_modules at runtime.
+    noExternal: ["decimal.js-light"],
+    external: ["@prisma/client", ".prisma/client"],
   },
 })
