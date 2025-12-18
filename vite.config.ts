@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     devtools(),
     nitro({
-      // 1. Tell Nitro (server build) to keep the engine external
+      // Prevent Nitro from crashing on the Prisma engine file
       externals: {
         external: ['.prisma/client', '.prisma/client/default', '.prisma/client/index']
       }
@@ -27,19 +27,17 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // 2. The original fix for the decimal package
+      // Fix the path so Vite can find the file during bundling
       "decimal.js-light/decimal": require.resolve("decimal.js-light")
     },
   },
-  // 3. Global Rollup config to catch any leaking imports
-  build: {
-    rollupOptions: {
-      external: ['.prisma/client/default', '.prisma/client']
-    }
-  },
   ssr: {
-    // 4. Bundle the wrapper, but externalize the engine
-    noExternal: ["@prisma/client", "decimal.js-light"],
-    external: [".prisma/client", ".prisma/client/default"], 
+    // 🟢 THE FIX: 
+    // 1. Bundle @prisma/client so we can patch its imports.
+    // 2. Use a REGEX for decimal.js-light to catch the "/decimal" sub-path.
+    noExternal: ["@prisma/client", /decimal\.js-light/],
+    
+    // Keep the engine external to avoid build errors
+    external: [".prisma/client", ".prisma/client/default", ".prisma/client/index"], 
   },
 })
