@@ -10,53 +10,59 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig({
-  plugins: [
-    {
-      name: 'prisma-patch-plugin',
-      enforce: 'pre',
-      // 1. SEARCH & REPLACE:
-      // Read the source code of Prisma files. If we see the broken import string, 
-      // replace it with our safe alias "@decimal-shim".
-      transform(code, id) {
-        if (id.includes('@prisma') && code.includes('decimal.js-light/decimal')) {
-          return code.replace(/["']decimal\.js-light\/decimal["']/g, '"@decimal-shim"');
+export default defineConfig(({ command }) => {
+  const isBuild = command === 'build'
+
+  return {
+    plugins: [
+      // 🟢 1. PRODUCTION ONLY: The "Search & Replace" Plugin
+      // This fixes the 'decimal.js-light' import bug in Vercel.
+      isBuild && {
+        name: 'prisma-patch-plugin',
+        enforce: 'pre',
+        transform(code, id) {
+          if (id.includes('@prisma') && code.includes('decimal.js-light/decimal')) {
+            return code.replace(/["']decimal\.js-light\/decimal["']/g, '"@decimal-shim"');
+          }
+        },
+        resolveId(id) {
+          if (id.includes('.prisma/client/default') || id.includes('.prisma/client/index')) {
+            return { id, external: true }
+          }
+          return null
         }
       },
-      // 2. BLOCK THE ENGINE:
-      // Prevent the build crash by externalizing the engine file.
-      resolveId(id) {
-        if (id.includes('.prisma/client/default') || id.includes('.prisma/client/index')) {
-          return { id, external: true }
+
+      devtools(),
+      nitro({
+        // Always keep the engine external to be safe
+        externals: {
+          external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
         }
-        return null
-      }
-    },
-    devtools(),
-    nitro({
-      externals: {
-        external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
-      }
-    }),
-    viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
+      }),
+      viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
+      tailwindcss(),
+      tanstackStart(),
+      viteReact(),
+    ],
 
-  resolve: {
-    alias: {
-      // 3. DEFINE THE ALIAS:
-      // When the code asks for "@decimal-shim" (which we inserted above),
-      // give it the local shim file.
-      "@decimal-shim": path.resolve(__dirname, "src/decimal-shim.ts")
+    resolve: {
+      alias: {
+        // 🟢 2. PRODUCTION ONLY: The Shim Alias
+        // Locally, we don't need this.
+        ...(isBuild ? {
+          "@decimal-shim": path.resolve(__dirname, "src/decimal-shim.ts")
+        } : {})
+      },
     },
-  },
 
-  ssr: {
-    // 4. BUNDLE EVERYTHING:
-    // Force Vite to process Prisma and Adapter so the transform hook (step 1) can run.
-    noExternal: ["@prisma/client", "@prisma/adapter-pg"],
-    external: [".prisma/client", ".prisma/client/index", ".prisma/client/default"], 
-  },
+    ssr: {
+      // 🟢 3. PRODUCTION ONLY: Force Bundling
+      // Locally (isBuild = false), this array is empty. 
+      // This stops Vite from trying to process Prisma locally, fixing the "module is not defined" error.
+      noExternal: isBuild ? ["@prisma/client", "@prisma/adapter-pg"] : [],
+      
+      external: isBuild ? [".prisma/client", ".prisma/client/index", ".prisma/client/default"] : [], 
+    },
+  }
 })
