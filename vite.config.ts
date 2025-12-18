@@ -5,6 +5,9 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 export default defineConfig({
   plugins: [
@@ -19,13 +22,16 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // 🟢 THE FIX: Redirects the broken import to the main package
-      "decimal.js-light/decimal": "decimal.js-light",
+      // 🟢 CRITICAL FIX:
+      // This forces "decimal.js-light/decimal" to point to the actual 
+      // "decimal.js-light" library file on your disk.
+      "decimal.js-light/decimal": require.resolve("decimal.js-light"),
     },
   },
   ssr: {
-    // 🟢 SAFETY: Forces Vite to bundle this library into your server file
-    // so Vercel doesn't have to look for it in node_modules at runtime.
+    // 🟢 CRITICAL FIX:
+    // This tells Vite: "Do not leave this as a 'require' statement.
+    // Bundle the code directly into my server file."
     noExternal: ["decimal.js-light"],
     external: ["@prisma/client", ".prisma/client"],
   },
