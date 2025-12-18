@@ -12,7 +12,12 @@ const require = createRequire(import.meta.url)
 export default defineConfig({
   plugins: [
     devtools(),
-    nitro(),
+    nitro({
+      // 1. Tell Nitro (server build) to keep the engine external
+      externals: {
+        external: ['.prisma/client', '.prisma/client/default', '.prisma/client/index']
+      }
+    }),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
@@ -22,16 +27,19 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // 1. Redirect the broken import to the valid one
+      // 2. The original fix for the decimal package
       "decimal.js-light/decimal": require.resolve("decimal.js-light")
     },
   },
+  // 3. Global Rollup config to catch any leaking imports
+  build: {
+    rollupOptions: {
+      external: ['.prisma/client/default', '.prisma/client']
+    }
+  },
   ssr: {
-    // 2. Bundle the main Prisma Client so step #1 can apply to it
+    // 4. Bundle the wrapper, but externalize the engine
     noExternal: ["@prisma/client", "decimal.js-light"],
-    
-    // 3. CRITICAL FIX: Do NOT bundle the internal generated engine.
-    // This fixes the "Rollup failed to resolve import .prisma/client/default" error.
     external: [".prisma/client", ".prisma/client/default"], 
   },
 })
