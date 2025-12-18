@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => {
 
   return {
     plugins: [
-      // 🟢 Production Plugin: Just blocks the engine crash
+      // Keep this ONE plugin to prevent the build-time crash
       isBuild && {
         name: 'block-prisma-engine',
         enforce: 'pre',
@@ -24,11 +24,14 @@ export default defineConfig(({ command }) => {
       },
 
       devtools(),
+      
+      // Clean Nitro config
       nitro({
         externals: {
           external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
         }
       }),
+      
       viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
       tailwindcss(),
       tanstackStart(),
@@ -36,7 +39,7 @@ export default defineConfig(({ command }) => {
     ],
 
     ssr: {
-      // 🟢 Bundle Prisma so it runs in the app
+      // We still want to bundle Prisma so it doesn't try to look for engines at runtime in weird places
       noExternal: isBuild ? ["@prisma/client", "@prisma/adapter-pg"] : [],
       external: isBuild ? [".prisma/client", ".prisma/client/index", ".prisma/client/default"] : [], 
     },
