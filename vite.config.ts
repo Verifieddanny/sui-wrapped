@@ -22,16 +22,16 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // 1. Redirect the bad import to the real file
+      // 1. Redirect the broken import to the valid one
       "decimal.js-light/decimal": require.resolve("decimal.js-light")
     },
   },
   ssr: {
-    // 2. CRITICAL: Bundle Prisma Client so Vite can apply the alias to it.
-    // If we leave it external, Vite ignores the code inside it.
+    // 2. Bundle the main Prisma Client so step #1 can apply to it
     noExternal: ["@prisma/client", "decimal.js-light"],
     
-    // 3. Ensure this is empty or does NOT contain @prisma/client
-    external: [], 
+    // 3. CRITICAL FIX: Do NOT bundle the internal generated engine.
+    // This fixes the "Rollup failed to resolve import .prisma/client/default" error.
+    external: [".prisma/client", ".prisma/client/default"], 
   },
 })
