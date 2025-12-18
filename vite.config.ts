@@ -5,27 +5,21 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
-import { createRequire } from 'module'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const require = createRequire(import.meta.url)
+// Necessary to get __dirname in ESM
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [
-    // 🟢 1. Custom Plugin: Force .prisma/client/default to be external
-    // This runs before Vite tries to find the file on disk.
-    {
-      name: 'force-external-prisma',
-      enforce: 'pre',
-      resolveId(id) {
-        // Capture the internal engine import that is breaking the build
-        if (id.includes('.prisma/client/default')) {
-          return { id, external: true }
-        }
-        return null
-      }
-    },
     devtools(),
-    nitro(),
+    nitro({
+      // Keep the engine external to prevent build crashes
+      externals: {
+        external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
+      }
+    }),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
@@ -33,14 +27,19 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+
   resolve: {
     alias: {
-      // 🟢 2. Fix the runtime crash by redirecting the broken package
-      "decimal.js-light/decimal": require.resolve("decimal.js-light")
+      // 🟢 THE TRICK: Point to a LOCAL file. 
+      // Vite sees this as "user code" and is forced to bundle it.
+      "decimal.js-light/decimal": path.resolve(__dirname, "src/decimal-shim.ts")
     },
   },
+
   ssr: {
-    // 🟢 3. Bundle the wrapper so we can apply the alias to it
-    noExternal: ["@prisma/client", /decimal\.js-light/], 
+    // Bundle the packages that use this library
+    noExternal: ["@prisma/client", "@prisma/adapter-pg"],
+    // Keep the engine external
+    external: [".prisma/client", ".prisma/client/index", ".prisma/client/default"], 
   },
 })
