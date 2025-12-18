@@ -6,11 +6,23 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
+export default defineConfig({
   plugins: [
+    // 1. Custom Plugin: Intercepts the bad import path
+    {
+      name: 'fix-decimal-light',
+      enforce: 'pre',
+      resolveId(id) {
+        // If anything tries to import the broken sub-path...
+        if (id === 'decimal.js-light/decimal') {
+          // ...redirect it to the main package and force bundling
+          return { id: 'decimal.js-light', external: false }
+        }
+        return null
+      }
+    },
     devtools(),
     nitro(),
-    // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
@@ -18,6 +30,9 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  ssr: {
+    // 2. Force Vite to bundle this package into the server file
+    noExternal: ['decimal.js-light'],
+    external: ['@prisma/client', '.prisma/client']
+  },
 })
-
-export default config
