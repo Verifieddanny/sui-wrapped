@@ -1,0 +1,15 @@
+diff --git a/package.json b/package.json
+index ef43c45b59c05c3ba5c49944a50a7d5ff6e00d69..b8865a15d045ae3709a26ff56a7cbfe316cb6de4 100644
+--- a/package.json
++++ b/package.json
+@@ -21,6 +21,10 @@
+     "url": "https://github.com/MikeMcl/decimal.js-light.git"
+   },
+   "main": "decimal",
++  "exports": {
++    ".": "./decimal.js",
++    "./decimal": "./decimal.js"
++  },
+   "module": "decimal.mjs",
+   "browser": "decimal.js",
+   "types": "decimal.d.ts",

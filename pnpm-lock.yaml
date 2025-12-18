@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  decimal.js-light:
+    hash: 49afc58705533d2763b2b23e8a4dd864db88953a8f8279e360163286c860d663
+    path: patches/decimal.js-light.patch
+
 importers:
 
   .:
@@ -46,7 +51,7 @@ importers:
         version: 2.1.1
       decimal.js-light:
         specifier: ^2.5.1
-        version: 2.5.1
+        version: 2.5.1(patch_hash=49afc58705533d2763b2b23e8a4dd864db88953a8f8279e360163286c860d663)
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -5401,7 +5406,7 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  decimal.js-light@2.5.1: {}
+  decimal.js-light@2.5.1(patch_hash=49afc58705533d2763b2b23e8a4dd864db88953a8f8279e360163286c860d663): {}
 
   decimal.js@10.6.0: {}
 
@@ -6347,7 +6352,7 @@ snapshots:
     dependencies:
       '@reduxjs/toolkit': 2.11.2(react-redux@9.2.0(@types/react@19.2.7)(react@19.2.3)(redux@5.0.1))(react@19.2.3)
       clsx: 2.1.1
-      decimal.js-light: 2.5.1
+      decimal.js-light: 2.5.1(patch_hash=49afc58705533d2763b2b23e8a4dd864db88953a8f8279e360163286c860d663)
       es-toolkit: 1.43.0
       eventemitter3: 5.0.1
       immer: 10.2.0

@@ -5,26 +5,16 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig(({ command }) => {
   const isBuild = command === 'build'
 
   return {
     plugins: [
-      // 🟢 1. PRODUCTION ONLY: The "Search & Replace" Plugin
-      // This fixes the 'decimal.js-light' import bug in Vercel.
+      // 🟢 Production Plugin: Just blocks the engine crash
       isBuild && {
-        name: 'prisma-patch-plugin',
+        name: 'block-prisma-engine',
         enforce: 'pre',
-        transform(code, id) {
-          if (id.includes('@prisma') && code.includes('decimal.js-light/decimal')) {
-            return code.replace(/["']decimal\.js-light\/decimal["']/g, '"@decimal-shim"');
-          }
-        },
         resolveId(id) {
           if (id.includes('.prisma/client/default') || id.includes('.prisma/client/index')) {
             return { id, external: true }
@@ -35,7 +25,6 @@ export default defineConfig(({ command }) => {
 
       devtools(),
       nitro({
-        // Always keep the engine external to be safe
         externals: {
           external: ['.prisma/client', '.prisma/client/index', '.prisma/client/default']
         }
@@ -46,22 +35,9 @@ export default defineConfig(({ command }) => {
       viteReact(),
     ],
 
-    resolve: {
-      alias: {
-        // 🟢 2. PRODUCTION ONLY: The Shim Alias
-        // Locally, we don't need this.
-        ...(isBuild ? {
-          "@decimal-shim": path.resolve(__dirname, "src/decimal-shim.ts")
-        } : {})
-      },
-    },
-
     ssr: {
-      // 🟢 3. PRODUCTION ONLY: Force Bundling
-      // Locally (isBuild = false), this array is empty. 
-      // This stops Vite from trying to process Prisma locally, fixing the "module is not defined" error.
+      // 🟢 Bundle Prisma so it runs in the app
       noExternal: isBuild ? ["@prisma/client", "@prisma/adapter-pg"] : [],
-      
       external: isBuild ? [".prisma/client", ".prisma/client/index", ".prisma/client/default"] : [], 
     },
   }
