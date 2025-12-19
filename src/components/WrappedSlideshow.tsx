@@ -40,17 +40,29 @@ const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.02
+    }
   },
-  exit: { opacity: 0, scale: 0.98, transition: { duration: 0.3 } }
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.2 }
+  }
 };
 
 const itemVariants: Variants = {
-  hidden: { y: 40, opacity: 0 },
+  hidden: {
+    y: 15,
+    opacity: 0
+  },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { type: "spring", stiffness: 120, damping: 20 }
+    transition: {
+      duration: 0.4,
+      ease: [0.215, 0.61, 0.355, 1.0]
+    }
   }
 };
 
@@ -79,33 +91,42 @@ const WaterSplashBackground = () => {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-[3rem]">
       <motion.div
-        className="absolute -top-[20%] -left-[20%] w-[140%] h-[140%] opacity-20"
-        animate={{ rotate: 360, scale: [1, 1.1, 0.9, 1], x: [0, 20, -20, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-      >
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" className="stop2" />
-              <stop offset="100%" className="stop1" />
-            </linearGradient>
-          </defs>
-          <path fill="url(#grad1)" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,79.6,-46.3C87.4,-33.5,90.1,-18,87.9,-3.3C85.7,11.4,78.6,25.3,69.5,37.6C60.4,49.9,49.3,60.6,36.4,68.2C23.5,75.8,8.8,80.3,-4.6,78.3C-18,76.3,-30.1,67.8,-41.5,59.3C-52.9,50.8,-63.6,42.3,-71.3,31.5C-79,20.7,-83.7,7.6,-81.4,-4.4C-79.1,-16.4,-69.8,-27.3,-59.9,-37.2C-50,-47.1,-39.5,-56,-27.8,-64.5C-16.1,-73,-3.2,-81.1,8.3,-79.7C19.8,-78.3,30.5,-83.6,44.7,-76.4Z" transform="translate(100 100)" />
-        </svg>
-      </motion.div>
-      <motion.div
-        className="absolute top-[20%] -right-[30%] w-[120%] h-[120%] opacity-20"
-        animate={{ rotate: -360, scale: [1, 1.2, 1] }}
+        className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] opacity-[0.15] will-change-transform"
+        animate={{
+          rotate: 360,
+          scale: [1, 1.05, 1],
+        }}
         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
       >
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 200 200" className="w-full h-full">
           <defs>
-            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" className="stop1" />
-              <stop offset="100%" className="stop2" />
+            <linearGradient id="blobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3D5DD9" />
+              <stop offset="100%" stopColor="#00D1FF" />
             </linearGradient>
           </defs>
-          <path fill="url(#grad2)" d="M38.1,-53.4C49.9,-43.9,60.4,-33.4,65.6,-20.9C70.8,-8.3,70.7,6.3,65.6,19.3C60.5,32.3,50.4,43.7,38.2,51.8C26,59.9,11.7,64.7,-2.1,67.6C-15.9,70.5,-29.1,71.5,-40.7,63.9C-52.3,56.3,-62.3,40.1,-66.1,23.3C-69.9,6.5,-67.5,-10.9,-59.9,-25.9C-52.3,-40.9,-39.5,-53.5,-26.3,-62.2C-13.1,-70.9,0.5,-75.7,12.2,-72.1C23.9,-68.5,33.7,-56.5,38.1,-53.4Z" transform="translate(100 100)" />
+          <path
+            fill="url(#blobGrad)"
+            d="M45,-60C58,-52,70,-40,75,-25C80,-10,78,8,70,24C62,40,48,54,32,62C16,70,0,72,-16,68C-32,64,-48,54,-58,40C-68,26,-72,8,-68,-10C-64,-28,-52,-46,-38,-54C-24,-62,-12,-60,3,-63C18,-66,32,-68,45,-60Z"
+            transform="translate(100 100)"
+          />
+        </svg>
+      </motion.div>
+
+      <motion.div
+        className="absolute -bottom-[20%] -right-[20%] w-full h-full opacity-10 will-change-transform"
+        animate={{
+          rotate: -360,
+          x: [0, 15, 0]
+        }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      >
+        <svg viewBox="0 0 200 200" className="w-full h-full">
+          <path
+            fill="#4DA2FF"
+            d="M40,-50C52,-42,62,-30,65,-16C68,-2,64,14,56,28C48,42,36,54,22,60C8,66,-8,66,-22,60C-36,54,-48,42,-56,28C-64,14,-68,-2,-65,-16C-62,-30,-52,-42,-40,-50C-28,-58,-14,-62,0,-62C14,-62,28,-58,40,-50Z"
+            transform="translate(100 100)"
+          />
         </svg>
       </motion.div>
     </div>
@@ -217,17 +238,23 @@ export default function WrappedSlideshow() {
   const slideKey = slides[currentStep];
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F5F5F5] text-[#111] overflow-hidden font-sans">
+    <div className="w-full h-dvh flex flex-col items-center justify-center bg-[#F5F5F5] text-[#111] overflow-hidden font-sans">
       <SuiBackground />
 
-      <div className="fixed top-6 left-0 w-full px-4 sm:px-8 z-50 flex justify-center gap-1.5 max-w-lg mx-auto right-0">
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-md z-50 flex gap-1.5 pointer-events-none">
         {slides.map((_, i) => (
-          <div key={i} className="h-1 flex-1 bg-gray-300/50 rounded-full overflow-hidden backdrop-blur-sm">
+          <div
+            key={i}
+            className="h-1 flex-1 bg-gray-300/40 rounded-full overflow-hidden backdrop-blur-xs"
+          >
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: i <= currentStep ? "100%" : "0%" }}
-              transition={{ duration: 0.3 }}
-              className={`h-full ${i === currentStep ? "bg-[#3D5DD9]" : "bg-slate-800"}`}
+              initial={false}
+              animate={{
+                width: i <= currentStep ? "100%" : "0%",
+                backgroundColor: i === currentStep ? "#3D5DD9" : "#1e293b"
+              }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="h-full"
             />
           </div>
         ))}
@@ -242,7 +269,7 @@ export default function WrappedSlideshow() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="w-full flex justify-center"
+            className="w-full max-w-md h-[70dvh] flex justify-center"
           >
             <Card cardRef={cardRef}>
 
@@ -349,9 +376,17 @@ export default function WrappedSlideshow() {
                     <Label icon={Target}>Portfolio</Label>
                     <h2 className="font-clash font-bold text-4xl md:text-5xl mt-2 text-slate-900">Top 5</h2>
                   </motion.div>
-                  <div className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar">
+                  <motion.div className="flex-1 flex flex-col gap-2 overflow-hidden"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
                     {data.topAssets.slice(0, 5).map((asset, i) => (
-                      <motion.div variants={itemVariants} key={i} className="flex items-center justify-between p-3 md:p-4 bg-white/60 hover:bg-white rounded-2xl border border-gray-100/50 hover:border-blue-200 transition-all shadow-sm group">
+                      <motion.div
+                        variants={itemVariants}
+                        key={asset.symbol}
+                        className="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-gray-100/50"
+                      >
                         <div className="flex items-center gap-3 md:gap-4">
                           <span className="font-mono-space text-xs font-bold text-slate-400 group-hover:text-[#3D5DD9] transition-colors">0{i + 1}</span>
                           <span className="font-clash font-semibold text-xl md:text-2xl uppercase text-slate-800">{asset.symbol}</span>
@@ -361,7 +396,7 @@ export default function WrappedSlideshow() {
                         </div>
                       </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                 </div>
               )}
 
@@ -373,7 +408,12 @@ export default function WrappedSlideshow() {
                   </motion.div>
                   <div className="flex-1 flex flex-col gap-2 overflow-y-auto overflow-x-auto no-scrollbar">
                     {data.topInteractors.slice(0, 5).map((person, i) => (
-                      <motion.div variants={itemVariants} key={i} className={`flex items-center justify-between p-3 md:p-4 rounded-2xl border transition-all shadow-sm ${i === 0 ? 'bg-[#111] text-white border-[#111] shadow-lg' : 'bg-white/70 border-gray-200 text-gray-800'}`}>
+                      <motion.div
+                        variants={itemVariants}
+                        key={person.address}
+                        className={`flex items-center justify-between p-4 rounded-2xl  ${i === 0 ? 'bg-[#111] text-white' : 'bg-white/70 shadow-md'
+                          }`}
+                      >
                         <div className="flex items-center gap-3">
                           {i === 0 && <Crown size={16} className="text-yellow-400 fill-yellow-400" />}
                           <div className="font-mono-space text-[10px] md:text-xs font-bold truncate w-24 md:w-32">{person.address.slice(0, 8)}...</div>
@@ -528,7 +568,7 @@ export default function WrappedSlideshow() {
         </AnimatePresence>
       </div>
 
-      <div className="fixed bottom-10 flex flex-col items-center gap-4 z-50 w-full max-w-100">
+      <div className="fixed bottom-8 flex flex-col items-center gap-4 z-50 w-full">
         <div className="flex gap-4 w-full justify-center">
           <button
             type="button"

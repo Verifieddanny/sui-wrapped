@@ -50,7 +50,7 @@ export default function Dashboard({ data, onReplay }: { data: WrappedData, onRep
                             <ArrowLeft size={20} />
                         </button>
                         <h1 className="font-clash font-bold text-xl md:text-2xl flex items-center gap-2">
-                            BlockWrap
+                            SuiWrap
                         </h1>
                     </div>
 
