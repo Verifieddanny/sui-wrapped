@@ -123,7 +123,7 @@ const SummaryCard = ({ data, cardRef }: { data: WrappedData, cardRef: any }) => 
             </div>
 
             <div className="mt-4 text-center">
-                <p className="font-mono text-[8px] text-slate-400 uppercase tracking-widest">block-wrap.xyz</p>
+                <p className="font-mono text-[8px] text-slate-400 uppercase tracking-widest">sui-wrapped-five.vercel.app</p>
             </div>
         </div>
     </div>
