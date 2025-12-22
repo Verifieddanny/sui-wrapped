@@ -388,7 +388,7 @@ export default function WrappedSlideshow() {
                   </motion.div>
                   <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-md rounded-2xl p-6 flex justify-between items-center border border-white/50">
                     <span className="font-mono-space text-xs text-slate-500 font-bold">USD VALUE</span>
-                    <span className="font-clash font-bold text-xl text-slate-900">${(topAssetPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="font-clash font-bold text-xl text-slate-900">${(data.topAssets[0]?.amount * topAssetPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   </motion.div>
                 </div>
               )}
