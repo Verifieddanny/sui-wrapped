@@ -14,7 +14,7 @@ import { toPng } from "html-to-image"
 import { getSuiPriceFn, getTopAssetPriceFn } from "@/functions/getSuiPrice.ts";
 
 
-type Asset = { symbol: string; amount: number };
+type Asset = { symbol: string; amount: number, name: string };
 type Interactor = { address: string; count: number };
 
 type WrappedData = {

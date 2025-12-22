@@ -46,7 +46,7 @@ export const getTopAssetPriceFn = createServerFn({ method: "GET" }).inputValidat
     }
 
     try {
-      console.log("Fetching fresh SUI price from CoinGecko...");
+      console.log(`Fetching fresh ${nameOfAsset} price from CoinGecko...`);
       const apiKey = process.env.COIN_GECKO_API;
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${nameOfAsset}&vs_currencies=usd&x_cg_demo_api_key=${apiKey}`;
 
