@@ -11,7 +11,7 @@ import { SuiBackground } from "./SuiBackground";
 import { useWrappedData } from "@/hooks/useWrappedData";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { toPng } from "html-to-image"
-import { getSuiPriceFn } from "@/functions/getSuiPrice.ts";
+import { getSuiPriceFn, getTopAssetPriceFn } from "@/functions/getSuiPrice.ts";
 
 
 type Asset = { symbol: string; amount: number };
@@ -73,6 +73,27 @@ export function useSuiPrice() {
     const fetchPrice = async () => {
       try {
         const fetchedPrice = await getSuiPriceFn();
+        if (fetchedPrice) {
+          setPrice(fetchedPrice);
+        }
+      } catch (err) {
+        console.error("Failed to load price from server", err);
+      }
+    };
+
+    fetchPrice();
+  }, []);
+
+  return price;
+}
+
+export function useTopAssetPrice(nameOfAsset: string) {
+  const [price, setPrice] = useState<number>(3.42);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const fetchedPrice = await getTopAssetPriceFn({ data: { name: nameOfAsset } });
         if (fetchedPrice) {
           setPrice(fetchedPrice);
         }
@@ -186,6 +207,8 @@ export default function WrappedSlideshow() {
   const { status, data: rawData } = useWrappedData(params.address);
   const data = rawData as WrappedData;
   const suiPrice = useSuiPrice();
+  const nameOfAsset = data?.topAssets?.[0]?.symbol?.toLowerCase() || 'sui';
+  const topAssetPrice = useTopAssetPrice(nameOfAsset) || 3.42;
   const displayPrice = suiPrice || 3.42;
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -365,7 +388,7 @@ export default function WrappedSlideshow() {
                   </motion.div>
                   <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-md rounded-2xl p-6 flex justify-between items-center border border-white/50">
                     <span className="font-mono-space text-xs text-slate-500 font-bold">USD VALUE</span>
-                    <span className="font-clash font-bold text-xl text-slate-900">${(data.topAssets[0]?.amount * displayPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="font-clash font-bold text-xl text-slate-900">${(topAssetPrice).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   </motion.div>
                 </div>
               )}
